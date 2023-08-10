@@ -1,9 +1,10 @@
+import time
 import scipy as sp
 from glob import glob
 import json
 import numpy as np
 import pandas as pd
-import time
+
 
 # default constant values
 CHUNK_LENGTH = 5000 # samples
@@ -12,7 +13,7 @@ SPEED_OF_SOUND = 343 # m/s
 #def plot_gcc_phat_image(sounds, fs, tdoa_gt, times_gt, chunk_length=5000)
 
 
-def evaluate_tdoa_estimator_on_recording(tdoa_estimator, recording_folder, print_status=True, chunk_length=CHUNK_LENGTH):
+def evaluate_tdoa_estimator_on_recording(tdoa_estimator, recording_folder, print_status=True, chunk_length=CHUNK_LENGTH, return_positions=False):
     if print_status:
         print(recording_folder)
         prev_status_update = time.time()
@@ -35,6 +36,19 @@ def evaluate_tdoa_estimator_on_recording(tdoa_estimator, recording_folder, print
                 prev_status_update = nowtime
         tdoa_chunk_estimation[:, :, i] = tdoa_estimator(problem)
         tdoa_chunk_gt[:, :, i] = problem[1]
+
+    if return_positions:
+        re_position_gt = {"speaker":np.zeros((3,tdoa_chunk_estimation.shape[2])),"mics":np.zeros((tdoa_chunk_estimation.shape[0],3,tdoa_chunk_estimation.shape[2]))}
+        for i in range(tdoa_chunk_estimation.shape[2]):
+            temp_time = problems[i][2]
+            gt_sample_in_period = (times_gt < temp_time + chunk_length/fs) & (times_gt > temp_time)
+
+            gt_index = np.where(gt_sample_in_period)[0][0]
+            for j in range(tdoa_chunk_estimation.shape[0]):
+                re_position_gt["mics"][j,:,i] = position_gt["mics"][j,:,gt_index]
+            re_position_gt["speaker"][:,i] = position_gt["speaker"][:,gt_index]
+        return tdoa_chunk_estimation, tdoa_chunk_gt, re_position_gt
+
     return tdoa_chunk_estimation, tdoa_chunk_gt
 
 def gcc_phat(problem, keep_dim = False, high_freq_cutoff=300):
