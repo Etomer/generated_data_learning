@@ -19,6 +19,9 @@ results_path = "../processed_data/detections"
 window_size = 10000
 
 # create folders
+if not os.path.exists("../processed_data"):
+    os.mkdir("../processed_data")
+
 if not os.path.exists(results_path):
     os.mkdir(results_path)
 

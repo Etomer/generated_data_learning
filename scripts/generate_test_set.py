@@ -69,7 +69,8 @@ for i in  range(len(positions)): # Fixing coordinate system so that first microp
     positions[i]["mics"] = positions[i]["mics"]@R.T
     positions[i]["speaker"] = positions[i]["speaker"]@R.T
 
-
+if not os.path.exists("../processed_data"):
+    os.mkdir("../processed_data")
 if not os.path.exists("../processed_data/test_set"):
     os.mkdir("../processed_data/test_set")
 pickle.dump(inliers, open("../processed_data/test_set/inliers.pkl", "wb"))
