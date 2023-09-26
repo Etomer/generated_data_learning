@@ -22,7 +22,11 @@ class TransformerNetwork(nn.Module):
         self.ffwd = nn.Sequential(
             nn.Linear(demb,200),
             nn.ReLU(),
-            nn.Linear(200,2),
+            nn.Linear(200,50),
+            nn.ReLU(),
+            nn.Linear(50,10),
+            nn.ReLU(),
+            nn.Linear(10,2),
         )
         #self.flatten = nn.Flatten()
         self.apply(self._init_weights)

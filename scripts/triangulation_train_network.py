@@ -32,6 +32,7 @@ model.to(device)
 
 loss_fn = torch.nn.MSELoss()
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+scheduler = torch.optim.lr_scheduler.LinearLR(optimizer, start_factor=1e-3,end_factor=1,total_iters=10)
 
 #model = torch.load("model_v5_80")
 # Training loop
@@ -72,4 +73,5 @@ for t in range(epochs):
         torch.save(model, "model_v5_" + str(t))
     print(f"Epoch {t+1}\n-------------------------------")
     train(model, loss_fn, optimizer, batch_size, 100)
+    scheduler.step()
 print("Done!")
